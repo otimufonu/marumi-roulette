@@ -545,7 +545,7 @@ const defaultStaff = [
 
 ];
 
-
+localStorage.removeItem("staffData");
 let staff =
     JSON.parse(localStorage.getItem("staffData"))
     || defaultStaff;
