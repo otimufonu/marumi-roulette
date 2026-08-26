@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>今日の担当</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 30px 20px;
+    background: #f3f3f3;
+    color: #222;
+    font-family: sans-serif;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.06);
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+input,
+select,
+button {
+    font-size: 16px;
+}
+
+input[type="date"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: white;
+}
+
+.staff-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.staff-button {
+    padding: 14px 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+}
+
+.staff-button.selected {
+    background: #222;
+    color: white;
+    border-color: #222;
+}
+
+.main-button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    background: #222;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.main-button:disabled {
+    opacity: .4;
+    cursor: default;
+}
+
+.small {
+    color: #777;
+    font-size: 13px;
+}
+
+
+/* =========================
+   結果
+========================= */
+
+.result {
+    text-align: center;
+}
+
+#rouletteText {
+    font-size: 30px;
+    font-weight: bold;
+    margin: 40px 0;
+}
+
+.result-role {
+    margin-bottom: 18px;
+    padding: 16px;
+    border-radius: 12px;
+}
+
+.result-role h2 {
+    margin: 0 0 8px;
+    font-size: 18px;
+}
+
+.result-name {
+    font-size: 27px;
+    font-weight: bold;
+}
+
+/* 担当ごとの色 */
+
+.role-hall {
+    background: #dceeff;
+    color: #12538a;
+}
+
+.role-service {
+    background: #dff5df;
+    color: #236b2b;
+}
+
+.role-wash {
+    background: #fff0c9;
+    color: #7b5700;
+}
+
+.role-combo {
+    background: #f0defc;
+    color: #713c94;
+}
+
+
+/* =========================
+   管理画面
+========================= */
+
+.admin-section h2 {
+    margin-top: 0;
+}
+
+.staff-admin {
+    border-top: 1px solid #ddd;
+    padding: 15px 0;
+}
+
+.staff-admin:first-child {
+    border-top: none;
+}
+
+.ability-row {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.ability-row input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.ability-label {
+    font-weight: bold;
+    text-align: center;
+}
+
+
+/* =========================
+   実績割合
+========================= */
+
+.stats-person {
+    border-top: 1px solid #ddd;
+    padding: 18px 0;
+}
+
+.stats-person:first-child {
+    border-top: none;
+}
+
+.stats-name {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.stats-bar {
+    height: 22px;
+    display: flex;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    background: #eee;
+}
+
+.stats-h {
+    background: #6eb5e8;
+}
+
+.stats-d {
+    background: #78c77a;
+}
+
+.stats-w {
+    background: #e8bf5b;
+}
+
+.stats-combo {
+    background: #b88bd8;
+}
+
+.stats-text {
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+
+/* =========================
+   履歴
+========================= */
+
+details {
+    border-top: 1px solid #ddd;
+}
+
+details:first-child {
+    border-top: none;
+}
+
+summary {
+    cursor: pointer;
+    padding: 14px 4px;
+    font-weight: bold;
+}
+
+.month-block {
+    margin-left: 10px;
+    margin-bottom: 5px;
+}
+
+.month-block summary {
+    font-weight: normal;
+}
+
+.history-day {
+    padding: 10px 8px;
+    border-top: 1px solid #eee;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.history-role-hall {
+    color: #12538a;
+}
+
+.history-role-service {
+    color: #236b2b;
+}
+
+.history-role-wash {
+    color: #7b5700;
+}
+
+.history-role-combo {
+    color: #713c94;
+}
+
+.hidden {
+    display: none;
+}
+
+
+/* =========================
+   隠し管理入口
+========================= */
+
+#secretArea {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 70px;
+    height: 70px;
+}
+
+.admin-link {
+    display: none;
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    padding: 8px 12px;
+    background: #222;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="secretArea"></div>
+<a href="#" id="adminLink" class="admin-link">管理者</a>
+
+<div class="container">
+
+<!-- =========================
+     通常画面
+========================= -->
+
+<section id="mainScreen">
+
+    <h1>今日の担当</h1>
+
+    <div class="card">
+
+        <label for="workDate">日付</label>
+
+        <input type="date" id="workDate">
+
+    </div>
+
+
+    <div class="card">
+
+        <label>今日の出勤者</label>
+
+        <div id="staffList" class="staff-list"></div>
+
+        <p class="small">
+            3人以上を選択してください。
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <button id="setButton"
+                class="main-button"
+                disabled>
+            セット
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     ルーレット
+========================= -->
+
+<section id="rouletteScreen" class="hidden">
+
+    <div class="card result">
+
+        <h1>本日の配置</h1>
+
+        <div id="rouletteText">
+            抽選中……
+        </div>
+
+        <div id="resultArea"></div>
+
+        <button id="backButton"
+                class="main-button hidden">
+            戻る
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     管理画面
+========================= -->
+
+<section id="adminScreen" class="hidden">
+
+    <h1>管理者ページ</h1>
+
+
+    <!-- 能力設定 -->
+
+    <div class="card admin-section">
+
+        <h2>能力設定</h2>
+
+        <p class="small">
+            h：ホール　d：拭き・ドリンク　w：洗い場
+        </p>
+
+        <div id="adminStaffList"></div>
+
+    </div>
+
+
+    <!-- 実際の担当割合 -->
+
+    <div class="card admin-section">
+
+        <h2>実際の担当割合</h2>
+
+        <div id="statsList"></div>
+
+    </div>
+
+
+    <!-- 履歴 -->
+
+    <div class="card admin-section">
+
+        <h2>担当履歴</h2>
+
+        <div id="historyList"></div>
+
+    </div>
+
+
+    <div class="card">
+
+        <button id="backToMain"
+                class="main-button">
+            通常画面へ戻る
+        </button>
+
+    </div>
+
+</section>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   初期スタッフ
+========================================================= */
+
+const defaultStaff = [
+
+    {
+        id: 1,
+        name: "こど",
+        isNew: false,
+        ability: {
+            h: 90,
+            d: 70,
+            w: 40
+        }
+    },
+
+    {
+        id: 2,
+        name: "ゆた",
+        isNew: false,
+        ability: {
+            h: 80,
+            d: 90,
+            w: 50
+        }
+    },
+
+    {
+        id: 3,
+        name: "いっ",
+        isNew: false,
+        ability: {
+            h: 50,
+            d: 80,
+            w: 90
+        }
+    },
+
+    {
+        id: 4,
+        name: "しゅじ",
+        isNew: false,
+        ability: {
+            h: 70,
+            d: 60,
+            w: 80
+        }
+    },
+
+    {
+        id: 5,
+        name: "ほの",
+        isNew: true,
+        ability: {
+            h: 40,
+            d: 70,
+            w: 95
+        }
+    },
+
+    {
+        id: 6,
+        name: "じゅんど",
+        isNew: true,
+        ability: {
+            h: 40,
+            d: 70,
+            w: 95
+        }
+    },
+
+    {
+        id: 7,
+        name: "よう",
+        isNew: true,
+        ability: {
+            h: 40,
+            d: 70,
+            w: 95
+        }
+    }
+
+];
+
+
+let staff =
+    JSON.parse(localStorage.getItem("staffData"))
+    || defaultStaff;
+
+staff.forEach(person => {
+    if (typeof person.isNew !== "boolean") {
+        person.isNew = false;
+    }
+});
+
+
+let history =
+    JSON.parse(localStorage.getItem("assignmentHistory"))
+    || [];
+
+
+let selectedStaff = [];
+
+
+/* =========================================================
+   初期化
+========================================================= */
+
+const dateInput =
+    document.getElementById("workDate");
+
+
+const today = new Date();
+
+const yyyy =
+    today.getFullYear();
+
+const mm =
+    String(today.getMonth() + 1)
+        .padStart(2, "0");
+
+const dd =
+    String(today.getDate())
+        .padStart(2, "0");
+
+
+dateInput.value =
+    `${yyyy}-${mm}-${dd}`;
+
+
+renderStaffList();
+
+
+/* =========================================================
+   スタッフ選択
+========================================================= */
+
+function renderStaffList() {
+
+    const area =
+        document.getElementById("staffList");
+
+    area.innerHTML = "";
+
+
+    staff.forEach(person => {
+
+        const button =
+            document.createElement("button");
+
+
+        button.className =
+            "staff-button";
+
+
+        button.textContent =
+            person.name;
+
+
+        button.onclick = () => {
+
+            if (selectedStaff.includes(person.id)) {
+
+                selectedStaff =
+                    selectedStaff.filter(
+                        id => id !== person.id
+                    );
+
+                button.classList.remove("selected");
+
+            } else {
+
+                selectedStaff.push(person.id);
+
+                button.classList.add("selected");
+            }
+
+
+            updateSetButton();
+        };
+
+
+        area.appendChild(button);
+    });
+}
+
+
+function updateSetButton() {
+
+    document.getElementById("setButton")
+        .disabled =
+        selectedStaff.length < 3;
+}
+
+
+/* =========================================================
+   セット
+========================================================= */
+
+document.getElementById("setButton")
+    .onclick = () => {
+
+        document.getElementById("mainScreen")
+            .classList.add("hidden");
+
+        document.getElementById("rouletteScreen")
+            .classList.remove("hidden");
+
+        runRoulette();
+    };
+
+
+/* =========================================================
+   重み付き抽選
+========================================================= */
+
+function weightedRandom(candidates, role) {
+
+    let weighted = [];
+
+
+    candidates.forEach(person => {
+
+        let weight =
+            person.ability[role];
+
+
+        const recentCount =
+            countRecentAssignments(
+                person.id,
+                role
+            );
+
+
+        if (recentCount === 1) {
+            weight *= 0.65;
+        }
+
+
+        if (recentCount >= 2) {
+            weight *= 0.35;
+        }
+
+
+        const last =
+            getLastAssignment(person.id);
+
+
+        if (last && last.role === role) {
+            weight *= 0.5;
+        }
+
+
+        weighted.push({
+            person,
+            weight
+        });
+
+    });
+
+
+    const total =
+        weighted.reduce(
+            (sum, item) =>
+                sum + item.weight,
+            0
+        );
+
+
+    let random =
+        Math.random() * total;
+
+
+    for (const item of weighted) {
+
+        random -= item.weight;
+
+
+        if (random <= 0) {
+            return item.person;
+        }
+
+    }
+
+
+    return weighted[weighted.length - 1].person;
+}
+
+
+/* =========================================================
+   最近の担当回数
+========================================================= */
+
+function countRecentAssignments(personId, role) {
+
+    const recent =
+        history.slice(-3);
+
+
+    return recent.filter(day => {
+
+        return day.assignments.some(
+            assignment =>
+                assignment.personId === personId &&
+                assignment.role === role
+        );
+
+    }).length;
+}
+
+
+/* =========================================================
+   最後の担当
+========================================================= */
+
+function getLastAssignment(personId) {
+
+    for (
+        let i = history.length - 1;
+        i >= 0;
+        i--
+    ) {
+
+        const found =
+            history[i].assignments.find(
+                assignment =>
+                    assignment.personId === personId
+            );
+
+
+        if (found) {
+            return found;
+        }
+    }
+
+
+    return null;
+}
+
+function getHallCandidates(available, selectedHall) {
+
+    /*
+     * すでに新人を1人ホールに選んでいる場合、
+     * 2人目の抽選では新人を候補から外す。
+     */
+
+    const hasNewHall =
+        selectedHall.some(
+            person => person.isNew
+        );
+
+
+    if (!hasNewHall) {
+        return available;
+    }
+
+
+    const experienced =
+        available.filter(
+            person => !person.isNew
+        );
+
+
+    /*
+     * ベテランが残っているなら、
+     * 新人をホール2人目から除外。
+     *
+     * ベテランが一人も残っていない場合は、
+     * 制約を無理に成立させられないので
+     * 元の候補を使う。
+     */
+
+    if (experienced.length > 0) {
+        return experienced;
+    }
+
+
+    return available;
+}
+/* =========================================================
+   配置決定
+========================================================= */
+
+function createAssignment() {
+
+    let available =
+        staff.filter(
+            person =>
+                selectedStaff.includes(person.id)
+        );
+
+
+    const assignments = [];
+
+
+    /* 3人の場合 */
+
+    if (available.length === 3) {
+
+        /* ホール2人 */
+
+        const selectedHall = [];
+
+for (let i = 0; i < 2; i++) {
+
+    const hallCandidates =
+        getHallCandidates(
+            available,
+            selectedHall
+        );
+
+
+    const person =
+        weightedRandom(
+            hallCandidates,
+            "h"
+        );
+
+
+    assignments.push({
+        personId: person.id,
+        personName: person.name,
+        role: "hall"
+    });
+
+
+    selectedHall.push(person);
+
+
+    available =
+        available.filter(
+            p => p.id !== person.id
+        );
+}
+
+
+        /* 残り1人が拭き・ドリンク＋洗い場 */
+
+        const person =
+            available[0];
+
+
+        assignments.push({
+            personId: person.id,
+            personName: person.name,
+            role: "combo"
+        });
+
+
+        return assignments;
+    }
+
+
+    /* 4人以上 */
+
+    /* ホール2人 */
+
+  const selectedHall = [];
+
+for (let i = 0; i < 2; i++) {
+
+    const hallCandidates =
+        getHallCandidates(
+            available,
+            selectedHall
+        );
+
+
+    const person =
+        weightedRandom(
+            hallCandidates,
+            "h"
+        );
+
+
+    assignments.push({
+        personId: person.id,
+        personName: person.name,
+        role: "hall"
+    });
+
+
+    selectedHall.push(person);
+
+
+    available =
+        available.filter(
+            p => p.id !== person.id
+        );
+}
+
+    /* 拭き・ドリンク */
+
+    const servicePerson =
+        weightedRandom(
+            available,
+            "d"
+        );
+
+
+    assignments.push({
+        personId: servicePerson.id,
+        personName: servicePerson.name,
+        role: "service"
+    });
+
+
+    available =
+        available.filter(
+            p => p.id !== servicePerson.id
+        );
+
+
+    /* 洗い場 */
+
+    if (available.length > 0) {
+
+        const washPerson =
+            weightedRandom(
+                available,
+                "w"
+            );
+
+
+        assignments.push({
+            personId: washPerson.id,
+            personName: washPerson.name,
+            role: "wash"
+        });
+    }
+
+
+    return assignments;
+}
+
+
+/* =========================================================
+   ルーレット
+========================================================= */
+
+function runRoulette() {
+
+    const text =
+        document.getElementById("rouletteText");
+
+
+    const resultArea =
+        document.getElementById("resultArea");
+
+
+    const backButton =
+        document.getElementById("backButton");
+
+
+    resultArea.innerHTML = "";
+
+    backButton.classList.add("hidden");
+
+
+    let count = 0;
+
+
+    const timer =
+        setInterval(() => {
+
+            const random =
+                staff[
+                    Math.floor(
+                        Math.random() * staff.length
+                    )
+                ];
+
+
+            text.textContent =
+                random.name;
+
+
+            count++;
+
+
+            if (count >= 20) {
+
+                clearInterval(timer);
+
+
+                const assignments =
+                    createAssignment();
+
+
+                showResult(assignments);
+
+
+                saveResult(assignments);
+
+
+                backButton.classList.remove(
+                    "hidden"
+                );
+            }
+
+        }, 80);
+}
+
+
+/* =========================================================
+   結果表示
+========================================================= */
+
+function showResult(assignments) {
+
+    const text =
+        document.getElementById("rouletteText");
+
+
+    text.textContent =
+        "決定！";
+
+
+    const resultArea =
+        document.getElementById("resultArea");
+
+
+    resultArea.innerHTML = "";
+
+
+    const roleInfo = {
+
+        hall: {
+            label: "ホール",
+            className: "role-hall"
+        },
+
+        service: {
+            label: "拭き・ドリンク",
+            className: "role-service"
+        },
+
+        wash: {
+            label: "洗い場",
+            className: "role-wash"
+        },
+
+        combo: {
+            label: "拭き・ドリンク＋洗い場",
+            className: "role-combo"
+        }
+
+    };
+
+
+    Object.keys(roleInfo).forEach(role => {
+
+        const people =
+            assignments.filter(
+                item =>
+                    item.role === role
+            );
+
+
+        if (people.length === 0) {
+            return;
+        }
+
+
+        const div =
+            document.createElement("div");
+
+
+        div.className =
+            `result-role ${roleInfo[role].className}`;
+
+
+        div.innerHTML = `
+            <h2>${roleInfo[role].label}</h2>
+            <div class="result-name">
+                ${people
+                    .map(p => p.personName)
+                    .join("・")}
+            </div>
+        `;
+
+
+        resultArea.appendChild(div);
+    });
+}
+
+
+/* =========================================================
+   保存
+========================================================= */
+
+function saveResult(assignments) {
+
+    const record = {
+
+        date: dateInput.value,
+
+        assignments
+
+    };
+
+
+    history.push(record);
+
+
+    localStorage.setItem(
+        "assignmentHistory",
+        JSON.stringify(history)
+    );
+}
+
+
+/* =========================================================
+   戻る
+========================================================= */
+
+document.getElementById("backButton")
+    .onclick = () => {
+
+        selectedStaff = [];
+
+
+        renderStaffList();
+
+
+        document.getElementById(
+            "rouletteScreen"
+        ).classList.add("hidden");
+
+
+        document.getElementById(
+            "mainScreen"
+        ).classList.remove("hidden");
+    };
+
+
+/* =========================================================
+   隠し管理画面
+========================================================= */
+
+let tapCount = 0;
+let tapTimer;
+
+
+document.getElementById("secretArea")
+    .addEventListener("click", () => {
+
+        tapCount++;
+
+
+        clearTimeout(tapTimer);
+
+
+        tapTimer =
+            setTimeout(() => {
+                tapCount = 0;
+            }, 1000);
+
+
+        if (tapCount >= 5) {
+
+            tapCount = 0;
+
+
+            const password =
+                prompt("管理者パスワード");
+
+
+            if (password === "marumi123") {
+
+                openAdmin();
+
+            } else {
+
+                alert(
+                    "パスワードが違います。"
+                );
+            }
+        }
+    });
+
+
+document.getElementById("adminLink")
+    .onclick = event => {
+
+        event.preventDefault();
+
+        openAdmin();
+    };
+
+
+function openAdmin() {
+
+    document.getElementById(
+        "mainScreen"
+    ).classList.add("hidden");
+
+
+    document.getElementById(
+        "rouletteScreen"
+    ).classList.add("hidden");
+
+
+    document.getElementById(
+        "adminScreen"
+    ).classList.remove("hidden");
+
+
+    renderAdmin();
+}
+
+
+/* =========================================================
+   管理画面
+========================================================= */
+
+function renderAdmin() {
+
+    renderAbilitySettings();
+
+    renderStats();
+
+    renderHistory();
+}
+
+
+/* =========================================================
+   能力設定
+========================================================= */function renderAbilitySettings() {
+
+    const area =
+        document.getElementById(
+            "adminStaffList"
+        );
+
+    area.innerHTML = "";
+
+
+    staff.forEach(person => {
+
+        const div =
+            document.createElement("div");
+
+
+        div.className =
+            "staff-admin";
+
+
+        div.innerHTML = `
+
+            <strong>${person.name}</strong>
+
+            <label style="
+                display:flex;
+                align-items:center;
+                gap:8px;
+                margin-top:10px;
+                font-weight:normal;
+            ">
+                <input
+                    type="checkbox"
+                    class="new-staff-checkbox"
+                    data-id="${person.id}"
+                    ${person.isNew ? "checked" : ""}
+                >
+                新人
+            </label>
+
+
+            <div class="ability-row">
+                <div class="ability-label">h</div>
+
+                <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value="${person.ability.h}"
+                    data-id="${person.id}"
+                    data-role="h"
+                >
+            </div>
+
+
+            <div class="ability-row">
+                <div class="ability-label">d</div>
+
+                <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value="${person.ability.d}"
+                    data-id="${person.id}"
+                    data-role="d"
+                >
+            </div>
+
+
+            <div class="ability-row">
+                <div class="ability-label">w</div>
+
+                <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value="${person.ability.w}"
+                    data-id="${person.id}"
+                    data-role="w"
+                >
+            </div>
+
+        `;
+
+
+        area.appendChild(div);
+    });
+
+
+    /* 能力値 */
+
+    area.querySelectorAll(
+        'input[type="number"]'
+    ).forEach(input => {
+
+        input.addEventListener(
+            "change",
+            () => {
+
+                const id =
+                    Number(input.dataset.id);
+
+                const role =
+                    input.dataset.role;
+
+                const value =
+                    Number(input.value);
+
+                const person =
+                    staff.find(
+                        p => p.id === id
+                    );
+
+                if (!person) {
+                    return;
+                }
+
+                person.ability[role] =
+                    value;
+
+                localStorage.setItem(
+                    "staffData",
+                    JSON.stringify(staff)
+                );
+            }
+        );
+    });
+
+
+    /* 新人設定 */
+
+    area.querySelectorAll(
+        ".new-staff-checkbox"
+    ).forEach(input => {
+
+        input.addEventListener(
+            "change",
+            () => {
+
+                const id =
+                    Number(input.dataset.id);
+
+                const person =
+                    staff.find(
+                        p => p.id === id
+                    );
+
+                if (!person) {
+                    return;
+                }
+
+                person.isNew =
+                    input.checked;
+
+                localStorage.setItem(
+                    "staffData",
+                    JSON.stringify(staff)
+                );
+            }
+        );
+    });
+}
+/* =========================================================
+   実際の担当割合
+========================================================= */
+
+function renderStats() {
+
+    const area =
+        document.getElementById(
+            "statsList"
+        );
+
+
+    area.innerHTML = "";
+
+
+    staff.forEach(person => {
+
+        let h = 0;
+        let d = 0;
+        let w = 0;
+        let combo = 0;
+
+
+        history.forEach(day => {
+
+            day.assignments.forEach(
+                assignment => {
+
+                    if (
+                        assignment.personId
+                        !== person.id
+                    ) {
+                        return;
+                    }
+
+
+                    if (
+                        assignment.role
+                        === "hall"
+                    ) {
+                        h++;
+                    }
+
+
+                    if (
+                        assignment.role
+                        === "service"
+                    ) {
+                        d++;
+                    }
+
+
+                    if (
+                        assignment.role
+                        === "wash"
+                    ) {
+                        w++;
+                    }
+
+
+                    if (
+                        assignment.role
+                        === "combo"
+                    ) {
+                        combo++;
+                    }
+
+                }
+            );
+
+        });
+
+
+        const total =
+            h + d + w + combo;
+
+
+        if (total === 0) {
+
+            const empty =
+                document.createElement(
+                    "div"
+                );
+
+            empty.className =
+                "stats-person";
+
+
+            empty.innerHTML = `
+                <div class="stats-name">
+                    ${person.name}
+                </div>
+                <div class="small">
+                    まだ担当履歴がありません
+                </div>
+            `;
+
+
+            area.appendChild(empty);
+
+            return;
+        }
+
+
+        const hp =
+            h / total * 100;
+
+        const dp =
+            d / total * 100;
+
+        const wp =
+            w / total * 100;
+
+        const cp =
+            combo / total * 100;
+
+
+        const div =
+            document.createElement(
+                "div"
+            );
+
+
+        div.className =
+            "stats-person";
+
+
+        div.innerHTML = `
+
+            <div class="stats-name">
+                ${person.name}
+            </div>
+
+            <div class="stats-bar">
+
+                <div
+                    class="stats-h"
+                    style="width:${hp}%">
+                </div>
+
+                <div
+                    class="stats-d"
+                    style="width:${dp}%">
+                </div>
+
+                <div
+                    class="stats-w"
+                    style="width:${wp}%">
+                </div>
+
+                <div
+                    class="stats-combo"
+                    style="width:${cp}%">
+                </div>
+
+            </div>
+
+            <div class="stats-text">
+
+                h：${h}回
+                （${hp.toFixed(1)}%）
+
+                ／
+
+                d：${d}回
+                （${dp.toFixed(1)}%）
+
+                ／
+
+                w：${w}回
+                （${wp.toFixed(1)}%）
+
+                ／
+
+                d+w：${combo}回
+                （${cp.toFixed(1)}%）
+
+            </div>
+        `;
+
+
+        area.appendChild(div);
+    });
+}
+
+
+/* =========================================================
+   年・月ごとの履歴
+========================================================= */
+
+function renderHistory() {
+
+    const area =
+        document.getElementById(
+            "historyList"
+        );
+
+
+    area.innerHTML = "";
+
+
+    if (history.length === 0) {
+
+        area.innerHTML =
+            `<p class="small">
+                まだ履歴がありません。
+            </p>`;
+
+        return;
+    }
+
+
+    const grouped = {};
+
+
+    history.forEach(day => {
+
+        const [year, month] =
+            day.date.split("-");
+
+
+        if (!grouped[year]) {
+            grouped[year] = {};
+        }
+
+
+        if (!grouped[year][month]) {
+            grouped[year][month] = [];
+        }
+
+
+        grouped[year][month].push(day);
+    });
+
+
+    const years =
+        Object.keys(grouped)
+            .sort()
+            .reverse();
+
+
+    years.forEach(year => {
+
+        const yearDetails =
+            document.createElement(
+                "details"
+            );
+
+
+        const yearSummary =
+            document.createElement(
+                "summary"
+            );
+
+
+        yearSummary.textContent =
+            `${year}年`;
+
+
+        yearDetails.appendChild(
+            yearSummary
+        );
+
+
+        const months =
+            Object.keys(
+                grouped[year]
+            )
+            .sort()
+            .reverse();
+
+
+        months.forEach(month => {
+
+            const monthDetails =
+                document.createElement(
+                    "details"
+                );
+
+
+            monthDetails.className =
+                "month-block";
+
+
+            const monthSummary =
+                document.createElement(
+                    "summary"
+                );
+
+
+            monthSummary.textContent =
+                `${Number(month)}月`;
+
+
+            monthDetails.appendChild(
+                monthSummary
+            );
+
+
+            const days =
+                grouped[year][month]
+                    .slice()
+                    .sort(
+                        (a, b) =>
+                            b.date.localeCompare(
+                                a.date
+                            )
+                    );
+
+
+            days.forEach(day => {
+
+                const div =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                div.className =
+                    "history-day";
+
+
+                const hall =
+                    day.assignments
+                        .filter(
+                            a =>
+                                a.role ===
+                                "hall"
+                        )
+                        .map(
+                            a =>
+                                a.personName
+                        )
+                        .join("・");
+
+
+                const service =
+                    day.assignments
+                        .filter(
+                            a =>
+                                a.role ===
+                                "service"
+                        )
+                        .map(
+                            a =>
+                                a.personName
+                        )
+                        .join("・");
+
+
+                const wash =
+                    day.assignments
+                        .filter(
+                            a =>
+                                a.role ===
+                                "wash"
+                        )
+                        .map(
+                            a =>
+                                a.personName
+                        )
+                        .join("・");
+
+
+                const combo =
+                    day.assignments
+                        .filter(
+                            a =>
+                                a.role ===
+                                "combo"
+                        )
+                        .map(
+                            a =>
+                                a.personName
+                        )
+                        .join("・");
+
+
+                div.innerHTML = `
+
+                    <strong>
+                        ${day.date}
+                    </strong>
+
+                    <br>
+
+                    <span
+                        class="history-role-hall">
+                        ホール：
+                        ${hall || "-"}
+                    </span>
+
+                    <br>
+
+                    <span
+                        class="history-role-service">
+                        拭き・ドリンク：
+                        ${service || "-"}
+                    </span>
+
+                    <br>
+
+                    <span
+                        class="history-role-wash">
+                        洗い場：
+                        ${wash || "-"}
+                    </span>
+
+                    ${
+                        combo
+                        ? `
+                        <br>
+                        <span
+                            class="history-role-combo">
+                            拭き・ドリンク＋洗い場：
+                            ${combo}
+                        </span>
+                        `
+                        : ""
+                    }
+
+                `;
+
+
+                monthDetails.appendChild(
+                    div
+                );
+
+            });
+
+
+            yearDetails.appendChild(
+                monthDetails
+            );
+
+        });
+
+
+        area.appendChild(
+            yearDetails
+        );
+
+    });
+}
+
+
+/* =========================================================
+   管理画面から戻る
+========================================================= */
+
+document.getElementById(
+    "backToMain"
+).onclick = () => {
+
+    document.getElementById(
+        "adminScreen"
+    ).classList.add("hidden");
+
+
+    document.getElementById(
+        "mainScreen"
+    ).classList.remove("hidden");
+};
+
+</script>
+
+</body>
+</html>
