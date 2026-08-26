@@ -378,6 +378,13 @@ summary {
             disabled>
             セット
         </button>
+        
+        <button id="trialButton"
+        class="main-button"
+        disabled
+        style="margin-top:10px;">
+    お試し回し
+</button>
 
     </div>
 
@@ -715,11 +722,14 @@ function renderStaffList() {
 
 function updateSetButton() {
 
-    document.getElementById(
-        "setButton"
-    ).disabled =
-        selectedStaff.length < 3;
+    const enabled =
+        selectedStaff.length >= 3;
 
+    document.getElementById("setButton")
+        .disabled = !enabled;
+
+    document.getElementById("trialButton")
+        .disabled = !enabled;
 }
 
 
@@ -741,9 +751,21 @@ document.getElementById(
     ).classList.remove("hidden");
 
 
-    runRoulette();
+    runRoulette(true);
 
 };
+
+document.getElementById("trialButton")
+    .onclick = () => {
+
+        document.getElementById("mainScreen")
+            .classList.add("hidden");
+
+        document.getElementById("rouletteScreen")
+            .classList.remove("hidden");
+
+        runRoulette(false);
+    };
 
 
 /* =========================================================
@@ -1251,7 +1273,7 @@ function createAssignment() {
    ルーレット
 ========================================================= */
 
-function runRoulette() {
+function runRoulette(saveHistory) {
 
     const text =
         document.getElementById(
@@ -1320,9 +1342,9 @@ function runRoulette() {
                     );
 
 
-                    saveResult(
-                        assignments
-                    );
+                    if (saveHistory) {
+    saveResult(assignments);
+}
 
 
                     backButton.classList.remove(
