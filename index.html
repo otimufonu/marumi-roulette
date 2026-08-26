@@ -1051,12 +1051,15 @@ function createAssignment() {
     const assignments = [];
 
 
-    /* =====================================================
-       3人の場合
-       ホール2人
-       残り1人が
-       拭き・ドリンク＋洗い場
-    ===================================================== */
+    /*
+     * ============================================
+     * 3人の場合
+     * ============================================
+     *
+     * 今まで通り
+     * ホール2人
+     * 残り1人が拭き・ドリンク＋洗い場
+     */
 
     if (
         available.length === 3
@@ -1113,10 +1116,6 @@ function createAssignment() {
         }
 
 
-        /*
-         * 残り1人
-         */
-
         const person =
             available[0];
 
@@ -1140,9 +1139,280 @@ function createAssignment() {
     }
 
 
-    /* =====================================================
-       4人以上
-    ===================================================== */
+    /*
+     * ============================================
+     * 4人の場合
+     * ============================================
+     */
+
+    if (
+        available.length === 4
+    ) {
+
+        const veterans =
+            available.filter(
+                person =>
+                    !person.isNew
+            );
+
+
+        const newcomers =
+            available.filter(
+                person =>
+                    person.isNew
+            );
+
+
+        /*
+         * ----------------------------------------
+         * ベテラン2人＋新人2人
+         *
+         * ホール：新人1＋ベテラン1
+         * ドリンク：ベテラン1
+         * 洗い場：新人1
+         * ----------------------------------------
+         */
+
+        if (
+            veterans.length === 2 &&
+            newcomers.length === 2
+        ) {
+
+            /*
+             * 新人2人のうち1人を
+             * ホールへ
+             */
+            const newHall =
+                randomPerson(
+                    newcomers
+                );
+
+
+            assignments.push({
+
+                personId:
+                    newHall.id,
+
+                personName:
+                    newHall.name,
+
+                role:
+                    "hall"
+
+            });
+
+
+            const remainingNewcomers =
+                newcomers.filter(
+                    person =>
+                        person.id !==
+                        newHall.id
+                );
+
+
+            /*
+             * ベテラン2人のうち1人を
+             * ホールへ
+             *
+             * ホール適性を使う
+             */
+            const veteranHall =
+                weightedHallRandom(
+                    veterans
+                );
+
+
+            assignments.push({
+
+                personId:
+                    veteranHall.id,
+
+                personName:
+                    veteranHall.name,
+
+                role:
+                    "hall"
+
+            });
+
+
+            const remainingVeterans =
+                veterans.filter(
+                    person =>
+                        person.id !==
+                        veteranHall.id
+                );
+
+
+            /*
+             * 残ったベテラン → ドリンク
+             */
+            const servicePerson =
+                remainingVeterans[0];
+
+
+            assignments.push({
+
+                personId:
+                    servicePerson.id,
+
+                personName:
+                    servicePerson.name,
+
+                role:
+                    "service"
+
+            });
+
+
+            /*
+             * 残った新人 → 洗い場
+             */
+            const washPerson =
+                remainingNewcomers[0];
+
+
+            assignments.push({
+
+                personId:
+                    washPerson.id,
+
+                personName:
+                    washPerson.name,
+
+                role:
+                    "wash"
+
+            });
+
+
+            return assignments;
+
+        }
+
+
+        /*
+         * ----------------------------------------
+         * ベテラン3人＋新人1人
+         *
+         * ホール：ベテラン2
+         * ドリンク：新人1
+         * 洗い場：ベテラン1
+         * ----------------------------------------
+         */
+
+        if (
+            veterans.length === 3 &&
+            newcomers.length === 1
+        ) {
+
+            /*
+             * ベテランから
+             * ホール2人を適性抽選
+             */
+
+            const hallCandidates =
+                [...veterans];
+
+
+            for (
+                let i = 0;
+                i < 2;
+                i++
+            ) {
+
+                const person =
+                    weightedHallRandom(
+                        hallCandidates
+                    );
+
+
+                assignments.push({
+
+                    personId:
+                        person.id,
+
+                    personName:
+                        person.name,
+
+                    role:
+                        "hall"
+
+                });
+
+
+                const index =
+                    hallCandidates.findIndex(
+                        p =>
+                            p.id ===
+                            person.id
+                    );
+
+
+                hallCandidates.splice(
+                    index,
+                    1
+                );
+
+            }
+
+
+            /*
+             * 新人 → ドリンク
+             */
+            const servicePerson =
+                newcomers[0];
+
+
+            assignments.push({
+
+                personId:
+                    servicePerson.id,
+
+                personName:
+                    servicePerson.name,
+
+                role:
+                    "service"
+
+            });
+
+
+            /*
+             * 残ったベテラン → 洗い場
+             */
+            const washPerson =
+                hallCandidates[0];
+
+
+            assignments.push({
+
+                personId:
+                    washPerson.id,
+
+                personName:
+                    washPerson.name,
+
+                role:
+                    "wash"
+
+            });
+
+
+            return assignments;
+
+        }
+
+    }
+
+
+    /*
+     * ============================================
+     * 4人以上の通常処理
+     *
+     * 特殊ルールに該当しない場合はこちら
+     * ============================================
+     */
 
     const selectedHall = [];
 
@@ -1201,9 +1471,6 @@ function createAssignment() {
 
     /*
      * 拭き・ドリンク
-     *
-     * 現在は適性値なし。
-     * 残った人から均等抽選。
      */
 
     const servicePerson =
