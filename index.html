@@ -609,7 +609,8 @@ let history =
             "assignmentHistory"
         )
     ) || [];
-
+localStorage.removeItem("assignmentHistory");
+location.reload();
 
 let selectedStaff = [];
 
